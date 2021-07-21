@@ -1,0 +1,73 @@
+{
+  "teams": [
+    {
+      "id": 1,
+      "name": "チーム1",
+      "token": "abc"
+    },
+    {
+      "id": 2,
+      "name": "チーム2",
+      "token": "abcd"
+    },
+    {
+      "id": 3,
+      "name": "チーム3",
+      "token": "abcde"
+    }
+  ],
+
+  "matches": [
+    {
+      "teams": [1,2],
+      "turns": 10,
+      "operationMillis": 10000,
+      "transitionMillis": 1000,
+      "startedAtUnixTime": 0,
+      "points": [
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1]
+      ],
+      "width": 5,
+      "height": 5,
+      "agents": 5
+    },
+    {
+      "teams": [2,3],
+      "turns": 10,
+      "operationMillis": 10000,
+      "transitionMillis": 1000,
+      "startedAtUnixTime": 0,
+      "points": [
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1]
+      ],
+      "width": 5,
+      "height": 5,
+      "agents": 5
+    },
+    {
+      "teams": [3,1],
+      "turns": 10,
+      "operationMillis": 10000,
+      "transitionMillis": 1000,
+      "startedAtUnixTime": 0,
+      "points": [
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1]
+      ],
+      "width": 5,
+      "height": 5,
+      "agents": 5
+    }
+  ]
+}
