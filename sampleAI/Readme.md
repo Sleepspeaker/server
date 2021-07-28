@@ -1,4 +1,5 @@
 # procon31_sampleAI
+### sampleAIの方は元々のコード＋何をしているかのコメント付き
 
 ## 接続設定
 
