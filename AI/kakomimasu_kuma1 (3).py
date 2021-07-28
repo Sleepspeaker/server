@@ -275,6 +275,7 @@ class SampleAI:
                     "x": action.pos.x,
                     "y": action.pos.y,
                     "type": action.type,
+                    "point": self._eval_weight(match, action)
                 }
             )
             i += 1
@@ -346,6 +347,10 @@ class SampleAI:
 
 #マスの評価をするみたいよ
     def _eval_square(self, match: Match, pos: Pos) -> int:
+        area = _at(match.areas, pos)    # 陣地
+        point = _at(match.points, pos)  # 点数
+        wall = _at(match.walls, pos)    # 壁
+
         if not match.in_bounds(pos):
             return 0
         wall = _at(match.walls, pos)
