@@ -11,7 +11,11 @@ DIR_Y = [-1, 0, 1, -1, 1, -1, 0, 1]
 
 surround_active = [1, 1, 1, 1, 0, 0]
 #マッチのidのリストとactiveのリスト作ろうかなぁ
-#idをキーにして探索できれば楽なんだけど±
+#idをキーにして探索できれば楽なんだけど
+#match_idは取れたからリストに入れよう
+#match_idを探索していろいろやろう
+match_id_list = []
+surround_active_list = []
 
 
 @dataclass(frozen=True)
@@ -150,7 +154,7 @@ class SampleAI:
 
             logger.info("[match_id:%d] start %d turn", self._match_id, match.turn)
 
-            actions = self._get_random_actions(match)#おそらくここで行動決定
+            actions = self._get_random_actions(match, self._match_id)#おそらくここで行動決定
             print(actions)
             self._client.post_action(self._match_id, actions)
             logger.info("[match_id:%d] post actions", self._match_id)
@@ -161,7 +165,15 @@ class SampleAI:
 
         logger.info("[match_id:%d] end", self._match_id)
 
-    def _get_random_actions(self, match: Match):#この関数がランダムだけど行動決めてる
+    def _get_random_actions(self, match: Match, match_id):#この関数がランダムだけど行動決めてる
+        print("match_idは " + str(match_id))
+        
+        if((match_id in match_id_list) == False):
+            match_id_list.append(match_id)
+            print("match_id_listに" + str(match_id) + "を追加しました")
+            surround_active_list.append([1, 1, 1, 1, 0, 0])
+        
+
         action_to: typing.Set[Pos] = set()
 
         def to_conflict(action: ActionRequest) -> bool:#競合確かめる
@@ -181,20 +193,20 @@ class SampleAI:
                 if not to_conflict(action)
             ]
             weights = [
-                max(self._eval_weight(match, action), 0.001) for action in candidates #0.001のところは必要に応じて小さく(0以下はダメ)
+                max(self._eval_weight(match, action), 0.001) for action in candidates
             ]
-            
-            print(weights)
+            for weight in weights:
+                weight += 100
 
             if agent.on_board():#エージェントがボード上に居たら
-                if(surround_active[i] == 1):#まだ囲み途中なら
+                if(surround_active_list[match_id_list.index(match_id)][i] == 1):#まだ囲み途中なら
                     if(i < 2): zone = self._check_zone2(agent.pos)
                     else:      zone = self._check_zone3(agent.pos)
                     
                     ag_x = agent.pos.x
                     ag_y = agent.pos.y
 
-                    print(str(agent.pos.x) + " " + str(agent.pos.y) + " zone:" + str(zone))
+                    #print(str(agent.pos.x) + " " + str(agent.pos.y) + " zone:" + str(zone))
                     if(zone < 100):
                         pos = Pos(x = ag_x, y = ag_y)
                         action = ActionRequest(type="stay", agent=agent, pos=pos)#バグ回避
@@ -212,8 +224,7 @@ class SampleAI:
                             action = ActionRequest(type="move", agent=agent, pos=pos)
                         elif(self._whitch_wall(match, pos) == 1):#敵の壁なら壊す
                             action = ActionRequest(type="remove", agent=agent, pos=pos)
-                        else:#味方の壁なら内側（斜め前）に行こうとする。将来的に内側が自陣なら外に行くようにしたいなぁ
-                            #自陣かどうか判定する関数作ったからそれ使ってみて改良したいねぇ
+                        else:#味方の壁なら内側（斜め前）に行こうとする。内側が自陣なら外に行くようにした
                             if(zone == 0):
                                 pos = Pos(x = ag_x + 1, y = ag_y + 1)
                             elif(zone == 1):
@@ -224,8 +235,8 @@ class SampleAI:
                                 pos = Pos(x = ag_x - 1, y = ag_y - 1)
                             
                             if(self._whitch_area(match, pos) == 2):#自分の陣地なら囲みをやめてフリーに
-                                surround_active[i] = 0
-                                print("agent " + str(i) + " 囲み終わりました！")
+                                surround_active_list[match_id_list.index(match_id)][i] = 0
+                                print("match" + str(match_id) + "のagent " + str(i) + " 囲み終わりました！")
                                 picked = random.choices(candidates, weights=weights, k=5)
                                 action = max(picked, key=lambda x : self._eval_weight(match,x))
                             else:#自分の陣地じゃないなら
@@ -353,28 +364,28 @@ class SampleAI:
         wall = _at(match.walls, pos)
 
         if(wall == 0):
-            print("壁なんてないで")
+            #print("壁なんてないで")
             return 0
         else:
             if wall != self._team_id:
-                print("相手の壁やで")
+                #print("相手の壁やで")
                 return 1
             else:
-                print("自分の壁やで")
+                #print("自分の壁やで")
                 return 2
     
     def _whitch_area(self, match:Match, pos: Pos) -> int:
         area = _at(match.areas, pos)
 
         if(area == 0):
-            print("陣地なんてないで")
+            #print("陣地なんてないで")
             return 0
         else:
             if area != self._team_id:
-                print("相手の陣地やで")
+                #print("相手の陣地やで")
                 return 1
             else:
-                print("自分の陣地やで")
+                #print("自分の陣地やで")
                 return 2
 
     """
